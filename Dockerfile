@@ -23,5 +23,5 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
-EXPOSE 9000
+EXPOSE 10000
 CMD ["/start.sh"]
