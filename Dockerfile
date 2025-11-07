@@ -8,12 +8,11 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 # Étape 2 : Runtime
 FROM php:8.3-fpm-alpine
 
-#Ajoute postgresql-dev (headers)
 RUN apk add --no-cache \
     postgresql-client \
     postgresql-dev \
   && docker-php-ext-install pdo pdo_pgsql \
-  && apk del postgresql-dev  # Nettoie après
+  && apk del postgresql-dev
 
 WORKDIR /var/www/html
 COPY --from=build /app /var/www/html

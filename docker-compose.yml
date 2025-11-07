@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: laravel_app
+    ports:
+      - "8000:9000"
+    env_file:
+      - .env.local
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    container_name: local_db
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: papebirame@31
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
