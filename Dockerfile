@@ -2,13 +2,18 @@
 FROM composer:2.6 AS build
 WORKDIR /app
 COPY composer.* ./
-COPY . .                    
+COPY . .
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Étape 2 : Runtime
 FROM php:8.3-fpm-alpine
-RUN apk add --no-cache postgresql-client \
-    && docker-php-ext-install pdo pdo_pgsql
+
+#Ajoute postgresql-dev (headers)
+RUN apk add --no-cache \
+    postgresql-client \
+    postgresql-dev \
+  && docker-php-ext-install pdo pdo_pgsql \
+  && apk del postgresql-dev  # Nettoie après
 
 WORKDIR /var/www/html
 COPY --from=build /app /var/www/html
