@@ -3,22 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Laravel\passport\HasApiTokens;
 
-class User extends Authenticatable
+class Marchant extends Model
 {
-    use HasApiTokens, HasFactory;
+    use HasFactory;
 
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = [
-        'name', 'phone', 'secret_code', 'is_dark_mode', 'language'
-    ];
-
-    protected $hidden = ['secret_code'];
+    protected $fillable = ['code', 'name', 'phone'];
 
     protected static function boot()
     {
@@ -28,7 +23,6 @@ class User extends Authenticatable
         });
     }
 
-    
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
