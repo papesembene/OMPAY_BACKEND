@@ -17,10 +17,20 @@ class DatabaseSeeder extends Seeder
        
         $merchants = Marchant::factory(2)->create();
 
-        
-        Transaction::factory(4)
-            ->recycle($users)      
-            ->recycle($merchants)  
-            ->create();
+       
+        foreach (range(1, 4) as $i) {
+            $type = fake()->randomElement(['payment', 'transfer']);
+
+            Transaction::factory()->create([
+               
+                'user_id' => $users->random()->id,
+
+               
+                'marchant_id' => $type === 'payment' ? $merchants->random()->id : null,
+
+                
+                'type' => $type,
+            ]);
+        }
     }
 }

@@ -21,7 +21,7 @@ class UserFactory extends Factory
             'id' => (string) Str::uuid(),
             'name' => $this->faker->name(),
             'phone' => '+221' . $this->faker->unique()->numerify('7########'),
-            'secret_code' => bcrypt('123456'), 
+            'secret_code' => bcrypt('1234'), 
             'is_dark_mode' => $this->faker->boolean(30),
             'language' => $this->faker->randomElement(['fr', 'en']),
         ];
