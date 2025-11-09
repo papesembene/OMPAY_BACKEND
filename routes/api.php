@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\PaymentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,4 +20,12 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+// Routes publiques
 Route::post('/auth/login', [AuthController::class, 'login']);
+
+// Routes protégées
+Route::middleware('auth:api')->group(function () {
+    Route::get('/balance', [PaymentController::class, 'checkBalance']);
+    Route::post('/payments', [PaymentController::class, 'makePayment']);
+    Route::post('/transfers', [PaymentController::class, 'makeTransfer']);
+});

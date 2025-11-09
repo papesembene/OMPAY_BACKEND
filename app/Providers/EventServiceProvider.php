@@ -2,34 +2,31 @@
 
 namespace App\Providers;
 
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
+use App\Events\PaiementEffectue;
+use App\Events\TransfertEffectue;
+use App\Listeners\EnvoyerNotificationPaiement;
+use App\Listeners\EnvoyerNotificationTransfert;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
     /**
-     * The event to listener mappings for the application.
+     * Les écouteurs d'événements pour l'application.
      *
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        Registered::class => [
-            SendEmailVerificationNotification::class,
+        PaiementEffectue::class => [
+            EnvoyerNotificationPaiement::class,
+        ],
+
+        TransfertEffectue::class => [
+            EnvoyerNotificationTransfert::class,
         ],
     ];
 
     /**
-     * Register any events for your application.
-     */
-    public function boot(): void
-    {
-        //
-    }
-
-    /**
-     * Determine if events and listeners should be automatically discovered.
+     * Déterminer si les événements et les écouteurs doivent être automatiquement découverts.
      */
     public function shouldDiscoverEvents(): bool
     {

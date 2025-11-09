@@ -32,11 +32,11 @@ paths:
                 phone:
                   type: string
                   example: "+221754579919"
-                  description: Numéro Orange Money
+                  description: Numéro Orange Money (utilisateur de test)
                 secret_code:
                   type: string
                   example: "1234"
-                  description: Code secret à 4 chiffres
+                  description: Code secret à 4 chiffres (mot de passe par défaut)
       responses:
         '200':
           description: Connexion réussie
@@ -57,7 +57,132 @@ paths:
               schema:
                 $ref: '#/components/schemas/ValidationError'
 
+  /payments:
+    post:
+      summary: Effectuer un paiement vers un marchand
+      tags:
+        - Payments
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - merchant_id
+              properties:
+                amount:
+                  type: number
+                  example: 5000
+                  description: Montant du paiement en FCFA
+                merchant_id:
+                  type: integer
+                  example: 1
+                  description: ID du marchand
+                description:
+                  type: string
+                  example: "Paiement de facture"
+                  description: Description optionnelle
+      responses:
+        '200':
+          description: Paiement réussi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentSuccess'
+        '400':
+          description: Erreur de paiement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /balance:
+    get:
+      summary: Vérifier le solde du wallet
+      tags:
+        - Wallet
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Solde récupéré avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceSuccess'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /transfers:
+    post:
+      summary: Effectuer un transfert vers un autre utilisateur
+      tags:
+        - Transfers
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - recipient_phone
+              properties:
+                amount:
+                  type: number
+                  example: 2500
+                  description: Montant du transfert en FCFA
+                recipient_phone:
+                  type: string
+                  example: "+221788888888"
+                  description: Numéro du destinataire (créez un autre utilisateur de test)
+                description:
+                  type: string
+                  example: "Transfert d'argent"
+                  description: Description optionnelle
+      responses:
+        '200':
+          description: Transfert réussi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferSuccess'
+        '400':
+          description: Erreur de transfert
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     LoginSuccess:
       type: object
@@ -89,6 +214,23 @@ components:
           type: string
           format: date-time
 
+# Données de test
+x-test-data:
+ users:
+   - name: "Dr. Brendon Windler I"
+     phone: "+221754579919"
+     secret_code: "1234"
+     balance: 0
+   - name: "Test User 2"
+     phone: "+221788888888"
+     secret_code: "1234"
+     balance: 0
+ merchants:
+   - id: "create-via-tinker"
+     name: "Test Merchant"
+     code: "MCH123456"
+     phone: "+221799999999"
+
     ErrorResponse:
       type: object
       properties:
@@ -115,3 +257,75 @@ components:
                 type: array
                 items:
                   type: string
+
+    PaymentSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Paiement effectué avec succès"
+        data:
+          type: object
+          properties:
+            transaction_id:
+              type: integer
+              example: 123
+            new_balance:
+              type: number
+              example: 15000
+            reference:
+              type: string
+              example: "TX202511091234567890"
+        timestamp:
+          type: string
+          format: date-time
+
+    BalanceSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Solde récupéré avec succès"
+        data:
+          type: object
+          properties:
+            balance:
+              type: number
+              example: 0
+            currency:
+              type: string
+              example: "FCFA"
+        timestamp:
+          type: string
+          format: date-time
+
+    TransferSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Transfert effectué avec succès"
+        data:
+          type: object
+          properties:
+            transaction_id:
+              type: integer
+              example: 124
+            new_balance:
+              type: number
+              example: 12500
+            reference:
+              type: string
+              example: "TX202511091234567891"
+        timestamp:
+          type: string
+          format: date-time

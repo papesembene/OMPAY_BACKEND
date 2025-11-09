@@ -26,6 +26,6 @@ class AuthService implements AuthServiceInterface
 
     public function generateToken(User $user): string
     {
-        return $user->createToken('ompay-app', ['access-app'])->accessToken;
+        return $user->createToken('ompay-app')->accessToken;
     }
 }
