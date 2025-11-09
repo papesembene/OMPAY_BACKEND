@@ -1,0 +1,117 @@
+openapi: 3.0.3
+info:
+  title: OM Pay API
+  description: API pour Orange Money Pay - Auth & Paiements
+  version: 1.0.0
+  contact:
+    name: Pape Sembene
+    email: pape@example.com
+
+servers:
+  - url: https://ompay-backend.onrender.com
+    description: Production
+  - url: http://localhost:8000/api
+    description: Local
+
+paths:
+  /auth/login:
+    post:
+      summary: Connexion utilisateur
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone
+                - secret_code
+              properties:
+                phone:
+                  type: string
+                  example: "+221754579919"
+                  description: Numéro Orange Money
+                secret_code:
+                  type: string
+                  example: "1234"
+                  description: Code secret à 4 chiffres
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSuccess'
+        '401':
+          description: Identifiants incorrects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation échouée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+components:
+  schemas:
+    LoginSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Connexion réussie"
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+              example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..."
+            user:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+                masked_phone:
+                  type: string
+                  example: "******4567"
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    ValidationError:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - properties:
+            errors:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string

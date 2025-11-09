@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>OM Pay API - Documentation</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css">
+    <style>
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        .swagger-ui .topbar { display: none; }
+        .header { padding: 20px; background: #f8f9fa; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>OM Pay API</h1>
+        <p>Documentation interactive - v1.0.0</p>
+    </div>
+    <div id="swagger"></div>
+
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script>
+        const ui = SwaggerUIBundle({
+            url: "/docs/openapi.yaml",
+            dom_id: '#swagger',
+            presets: [SwaggerUIBundle.presets.apis],
+            layout: "BaseLayout"
+        });
+    </script>
+</body>
+</html>

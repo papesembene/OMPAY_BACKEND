@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Wallet;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -25,5 +26,12 @@ class UserFactory extends Factory
             'is_dark_mode' => $this->faker->boolean(30),
             'language' => $this->faker->randomElement(['fr', 'en']),
         ];
+    }
+
+    public function withWallet()
+    {
+        return $this->afterCreating(function ($user) {
+            Wallet::factory()->create(['user_id' => $user->id]);
+        });
     }
 }

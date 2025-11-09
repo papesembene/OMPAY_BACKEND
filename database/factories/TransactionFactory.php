@@ -17,13 +17,17 @@ class TransactionFactory extends Factory
      */
     protected $model = Transaction::class;
 
+    
+
     public function definition(): array
     {
         $type = $this->faker->randomElement(['payment', 'transfer']);
+        $user = User::factory()->withWallet(); 
 
         return [
             'id' => (string) Str::uuid(),
-            'user_id' => User::factory(),
+            'user_id' => $user,
+            'wallet_id' => fn () => $user->wallet->id, 
             'type' => $type,
             'amount' => $this->faker->randomFloat(2, 500, 50000),
             'status' => $this->faker->randomElement(['success', 'pending', 'failed']),
