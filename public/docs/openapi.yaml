@@ -1,3 +1,10 @@
+openapi: 3.0.3
+info:
+  title: OMPAY API
+  version: 1.0.0
+  description: >
+    API de paiement mobile simulant les fonctionnalités d’Orange Money :
+    authentification, paiements, transferts et consultation de solde.
 
 servers:
   - url: https://ompay-backend.onrender.com/api/v1
@@ -143,7 +150,7 @@ paths:
                 recipient_phone:
                   type: string
                   example: "+221788888888"
-                  description: Numéro du destinataire (créez un autre utilisateur de test)
+                  description: Numéro du destinataire
                 description:
                   type: string
                   example: "Transfert d'argent"
@@ -206,23 +213,6 @@ components:
           type: string
           format: date-time
 
-# Données de test
-x-test-data:
- users:
-   - name: "Dr. Brendon Windler I"
-     phone: "+221754579919"
-     secret_code: "1234"
-     balance: 0
-   - name: "Test User 2"
-     phone: "+221788888888"
-     secret_code: "1234"
-     balance: 0
- merchants:
-   - id: "create-via-tinker"
-     name: "Test Merchant"
-     code: "MCH123456"
-     phone: "+221799999999"
-
     ErrorResponse:
       type: object
       properties:
@@ -231,6 +221,7 @@ x-test-data:
           example: false
         message:
           type: string
+          example: "Une erreur est survenue"
         errors:
           type: array
           items:
@@ -242,7 +233,8 @@ x-test-data:
     ValidationError:
       allOf:
         - $ref: '#/components/schemas/ErrorResponse'
-        - properties:
+        - type: object
+          properties:
             errors:
               type: object
               additionalProperties:
@@ -321,3 +313,19 @@ x-test-data:
         timestamp:
           type: string
           format: date-time
+
+x-test-data:
+  users:
+    - name: "Dr. Brendon Windler I"
+      phone: "+221754579919"
+      secret_code: "1234"
+      balance: 0
+    - name: "Test User 2"
+      phone: "+221788888888"
+      secret_code: "1234"
+      balance: 0
+  merchants:
+    - id: "create-via-tinker"
+      name: "Test Merchant"
+      code: "MCH123456"
+      phone: "+221799999999"
