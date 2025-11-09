@@ -1,11 +1,3 @@
-openapi: 3.0.3
-info:
-  title: OM Pay API
-  description: API pour Orange Money Pay - Auth & Paiements
-  version: 1.0.0
-  contact:
-    name: Pape Sembene
-    email: pape@example.com
 
 servers:
   - url: https://ompay-backend.onrender.com/api/v1
