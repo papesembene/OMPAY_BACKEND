@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Contracts\WalletServiceInterface;
 use App\Models\Wallet;
+use Exception;
 
 class WalletService implements WalletServiceInterface
 {
@@ -16,8 +17,18 @@ class WalletService implements WalletServiceInterface
      */
     public function debit(Wallet $wallet, float $amount): float
     {
+        if (!$wallet) {
+            throw new Exception('Wallet non trouvé');
+        }
+
+        if (!isset($wallet->balance)) {
+            throw new Exception('Balance non disponible dans le wallet');
+        }
+
         $ancienSolde = $wallet->balance;
+        
         $wallet->decrement('balance', $amount);
+        
         return $ancienSolde;
     }
 
@@ -30,6 +41,14 @@ class WalletService implements WalletServiceInterface
      */
     public function credit(Wallet $wallet, float $amount): float
     {
+        if (!$wallet) {
+            throw new Exception('Wallet non trouvé');
+        }
+
+        if (!isset($wallet->balance)) {
+            throw new Exception('Balance non disponible dans le wallet');
+        }
+
         $wallet->increment('balance', $amount);
         return $wallet->fresh()->balance;
     }
@@ -43,6 +62,10 @@ class WalletService implements WalletServiceInterface
      */
     public function hasSufficientFunds(Wallet $wallet, float $amount): bool
     {
+        if (!$wallet || !isset($wallet->balance)) {
+            return false;
+        }
+
         return $wallet->balance >= $amount;
     }
 
@@ -54,6 +77,14 @@ class WalletService implements WalletServiceInterface
      */
     public function getBalance(Wallet $wallet): float
     {
+        if (!$wallet) {
+            throw new Exception('Wallet non trouvé');
+        }
+
+        if (!isset($wallet->balance)) {
+            throw new Exception('Balance non disponible dans le wallet');
+        }
+
         return $wallet->balance;
     }
 }

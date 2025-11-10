@@ -25,6 +25,7 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 
 // Routes protégées
 Route::middleware('auth:api')->group(function () {
+    Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/balance', [PaymentController::class, 'checkBalance']);
     Route::post('/payments', [PaymentController::class, 'makePayment']);
     Route::post('/transfers', [PaymentController::class, 'makeTransfer']);

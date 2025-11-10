@@ -20,7 +20,7 @@ class WalletFactory extends Factory
         return [
             'id' => \Illuminate\Support\Str::uuid(),
             'user_id' => \App\Models\User::factory(),
-            'balance' => $this->faker->randomFloat(2, 1000, 50000),
+            'balance' => $this->faker->randomFloat(2, 10000, 50000),
         ];
     }
 }

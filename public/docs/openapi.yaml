@@ -71,16 +71,20 @@ paths:
               type: object
               required:
                 - amount
-                - merchant_id
+                - merchant_code
               properties:
                 amount:
                   type: number
                   example: 5000
                   description: Montant du paiement en FCFA
-                merchant_id:
-                  type: integer
-                  example: 1
-                  description: ID du marchand
+                merchant_code:
+                  type: string
+                  example: "MCH123456"
+                  description: Code du marchand
+                merchant_phone:
+                  type: string
+                  example: "+221799999999"
+                  description: Numéro de téléphone du marchand
                 description:
                   type: string
                   example: "Paiement de facture"
@@ -255,11 +259,12 @@ components:
           type: object
           properties:
             transaction_id:
-              type: integer
-              example: 123
+              type: string
+              format: uuid
+              example: "026f31bb-2746-4c8a-a54b-cd2a7a44b13a"
             new_balance:
               type: number
-              example: 15000
+              example: 10000
             reference:
               type: string
               example: "TX202511091234567890"
@@ -281,7 +286,7 @@ components:
           properties:
             balance:
               type: number
-              example: 0
+              example: 15000
             currency:
               type: string
               example: "FCFA"
@@ -302,11 +307,12 @@ components:
           type: object
           properties:
             transaction_id:
-              type: integer
-              example: 124
+              type: string
+              format: uuid
+              example: "12345678-1234-1234-1234-123456789012"
             new_balance:
               type: number
-              example: 12500
+              example: 10000
             reference:
               type: string
               example: "TX202511091234567891"
@@ -319,13 +325,12 @@ x-test-data:
     - name: "Dr. Brendon Windler I"
       phone: "+221754579919"
       secret_code: "1234"
-      balance: 0
+      balance: 15000
     - name: "Test User 2"
       phone: "+221788888888"
       secret_code: "1234"
-      balance: 0
+      balance: 12500
   merchants:
-    - id: "create-via-tinker"
-      name: "Test Merchant"
+    - name: "Test Merchant"
       code: "MCH123456"
       phone: "+221799999999"

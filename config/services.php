@@ -31,4 +31,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'orange' => [
+        'client_id' => env('ORANGE_CLIENT_ID', 'gg7IzICvtZkXrPIQD2jLPTfNRabnxSZD'),
+        'client_secret' => env('ORANGE_CLIENT_SECRET', 'Enckahtq5dgVQHChXmaJrt3QoPsg1d8cpldRrkoLitXq'),
+    ],
+
 ];

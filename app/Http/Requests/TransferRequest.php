@@ -23,7 +23,12 @@ class TransferRequest extends FormRequest
     {
         return [
             'amount' => 'required|numeric|min:100|max:1000000',
-            'recipient_phone' => 'required|string|regex:/^\+221[0-9]{9}$/',
+            'recipient_phone' => [
+                'required',
+                'string',
+                'regex:/^(\+221)?(70|71|75|76|77|78)[0-9]{7}$/',
+               
+            ],
             'description' => 'nullable|string|max:255',
         ];
     }
@@ -46,16 +51,4 @@ class TransferRequest extends FormRequest
         ];
     }
 
-    /**
-     * Configure the validator instance.
-     */
-    public function withValidator($validator): void
-    {
-        $validator->after(function ($validator) {
-            // Empêcher le transfert vers soi-même
-            if (request('recipient_phone') === auth()->user()->phone) {
-                $validator->errors()->add('recipient_phone', 'Vous ne pouvez pas transférer vers votre propre numéro.');
-            }
-        });
-    }
 }

@@ -9,4 +9,5 @@ interface AuthServiceInterface
 {
     public function login(LoginRequest $request): ?array;
     public function generateToken(User $user): string;
+    public function logout(): void;
 }

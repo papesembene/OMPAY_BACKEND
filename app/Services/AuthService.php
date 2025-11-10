@@ -28,4 +28,9 @@ class AuthService implements AuthServiceInterface
     {
         return $user->createToken('ompay-app')->accessToken;
     }
+
+    public function logout(): void
+    {
+        auth()->user()->token()->revoke();
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\PaiementEffectue;
+use App\Services\OrangeSmsService;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -10,12 +11,14 @@ use Illuminate\Support\Facades\Log;
  */
 class EnvoyerNotificationPaiement
 {
+    protected $smsService;
+
     /**
      * Créer le listener d'événement.
      */
-    public function __construct()
+    public function __construct(OrangeSmsService $smsService)
     {
-        //
+        $this->smsService = $smsService;
     }
 
     /**
@@ -34,10 +37,21 @@ class EnvoyerNotificationPaiement
             'reference' => $event->transaction->orange_tx_id,
         ]);
 
-        // Ici vous pourriez envoyer :
-        // - Un SMS à l'utilisateur
-        // - Un email de confirmation
-        // - Une notification push
-        // - Une notification au marchand
+        // Envoyer SMS à l'utilisateur
+        $user = $event->transaction->user;
+        $marchand = $event->transaction->marchant;
+
+        $messageUtilisateur = "OM Pay: Paiement de {$event->transaction->amount} FCFA effectué vers {$marchand->name}. Nouveau solde: {$event->nouveauSolde} FCFA. Ref: {$event->transaction->orange_tx_id}";
+
+        // Envoi réel du SMS via Orange API
+        $this->smsService->sendSms($user->phone, $messageUtilisateur);
+
+        // Envoyer SMS au marchand (si numéro disponible)
+        if ($marchand && $marchand->phone) {
+            $messageMarchand = "OM Pay: Nouveau paiement reçu de {$user->name} - {$event->transaction->amount} FCFA. Ref: {$event->transaction->orange_tx_id}";
+
+            // Envoi réel du SMS via Orange API
+            $this->smsService->sendSms($marchand->phone, $messageMarchand);
+        }
     }
 }

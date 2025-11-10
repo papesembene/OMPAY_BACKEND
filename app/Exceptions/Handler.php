@@ -88,7 +88,15 @@ class Handler extends ExceptionHandler
             ], 500);
         }
 
-        // 6. Sinon → Laravel par défaut (dev)
+        // 6. Log détaillé pour les erreurs non gérées
+        \Illuminate\Support\Facades\Log::error('Unhandled API exception', [
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ]);
+
+        // 7. Sinon → Laravel par défaut (dev)
         // return parent::render($request, $e);
     }
 }

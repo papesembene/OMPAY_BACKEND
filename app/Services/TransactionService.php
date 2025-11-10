@@ -15,13 +15,26 @@ class TransactionService implements TransactionServiceInterface
      */
     public function createPayment(array $data): Transaction
     {
+        // Trouver le marchand par code ou téléphone
+        $merchant = null;
+        if (isset($data['merchant_code'])) {
+            $merchant = \App\Models\Marchant::where('code', $data['merchant_code'])->first();
+        } elseif (isset($data['merchant_phone'])) {
+            $merchant = \App\Models\Marchant::where('phone', $data['merchant_phone'])->first();
+        }
+
+        $user = auth()->user();
+        if (!$user || !$user->wallet) {
+            throw new \Exception('Utilisateur ou wallet non trouvé');
+        }
+
         return Transaction::create([
-            'user_id' => auth()->id(),
-            'wallet_id' => auth()->user()->wallet->id,
+            'user_id' => $user->id,
+            'wallet_id' => $user->wallet->id,
             'amount' => $data['amount'],
             'type' => 'payment',
             'status' => 'success',
-            'marchant_id' => $data['merchant_id'],
+            'marchant_id' => $merchant ? $merchant->id : null,
             'orange_tx_id' => $this->generateReference(),
             'description' => $data['description'] ?? null,
         ]);
@@ -35,9 +48,14 @@ class TransactionService implements TransactionServiceInterface
      */
     public function createTransfer(array $data): Transaction
     {
+        $user = auth()->user();
+        if (!$user || !$user->wallet) {
+            throw new \Exception('Utilisateur ou wallet non trouvé');
+        }
+
         return Transaction::create([
-            'user_id' => auth()->id(),
-            'wallet_id' => auth()->user()->wallet->id,
+            'user_id' => $user->id,
+            'wallet_id' => $user->wallet->id,
             'amount' => $data['amount'],
             'type' => 'transfer',
             'status' => 'success',

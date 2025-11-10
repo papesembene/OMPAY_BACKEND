@@ -33,4 +33,14 @@ class AuthController extends Controller
             return $this->error('Identifiants incorrects.', 401);
         }
     }
+
+    public function logout(): JsonResponse
+    {
+        try {
+            $this->authService->logout();
+            return $this->success(null, 'Déconnexion réussie');
+        } catch (\Exception $e) {
+            return $this->error('Erreur lors de la déconnexion.', 500);
+        }
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\TransfertEffectue;
+use App\Services\OrangeSmsService;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -10,12 +11,14 @@ use Illuminate\Support\Facades\Log;
  */
 class EnvoyerNotificationTransfert
 {
+    protected $smsService;
+
     /**
      * Créer le listener d'événement.
      */
-    public function __construct()
+    public function __construct(OrangeSmsService $smsService)
     {
-        //
+        $this->smsService = $smsService;
     }
 
     /**
@@ -34,10 +37,22 @@ class EnvoyerNotificationTransfert
             'reference' => $event->transaction->orange_tx_id,
         ]);
 
-        // Ici vous pourriez envoyer :
-        // - Un SMS à l'expéditeur
-        // - Un SMS au destinataire
-        // - Des emails de confirmation
-        // - Des notifications push
+        // Envoyer SMS à l'expéditeur
+        $expediteur = $event->transaction->user;
+        // Trouver le destinataire par numéro de téléphone
+        $destinataire = \App\Models\User::where('phone', $event->numeroDestinataire)->first();
+
+        if ($destinataire) {
+            $messageExpediteur = "OM Pay: Transfert de {$event->transaction->amount} FCFA envoyé à {$destinataire->name}. Nouveau solde: {$event->nouveauSoldeExpediteur} FCFA. Ref: {$event->transaction->orange_tx_id}";
+
+            // Envoi réel du SMS via Orange API
+            $this->smsService->sendSms($expediteur->phone, $messageExpediteur);
+
+            // Envoyer SMS au destinataire
+            $messageDestinataire = "OM Pay: Vous avez reçu {$event->transaction->amount} FCFA de {$expediteur->name}. Ref: {$event->transaction->orange_tx_id}";
+
+            // Envoi réel du SMS via Orange API
+            $this->smsService->sendSms($destinataire->phone, $messageDestinataire);
+        }
     }
 }

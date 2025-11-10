@@ -14,7 +14,7 @@ class Transaction extends Model
     public $incrementing = false;
 
     protected $fillable = [
-        'user_id', 'type', 'amount', 'status',
+        'user_id', 'wallet_id', 'type', 'amount', 'status',
         'merchant_id', 'recipient_phone', 'orange_tx_id'
     ];
 
@@ -34,5 +34,10 @@ class Transaction extends Model
     public function marchant()
     {
         return $this->belongsTo(Marchant::class);
+    }
+
+    public function wallet()
+    {
+        return $this->belongsTo(Wallet::class);
     }
 }

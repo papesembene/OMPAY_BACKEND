@@ -23,7 +23,7 @@ class PaymentController extends Controller
      */
     public function checkBalance(): JsonResponse
     {
-        $user = auth()->user();
+        $user = auth()->user()->load('wallet');
         $wallet = $user->wallet;
 
         if (!$wallet) {
@@ -40,20 +40,27 @@ class PaymentController extends Controller
      * Effectuer un paiement vers un marchand
      */
     public function makePayment(PaymentRequest $request): JsonResponse
-    {
-        try {
-            $result = $this->paymentService->makePayment($request->validated());
+{
+    try {
+        $user = auth()->user()->loadMissing('wallet'); // <-- important
 
-            return $this->success([
-                'transaction_id' => $result['transaction_id'],
-                'new_balance' => $result['new_balance'],
-                'reference' => $result['reference'],
-            ], 'Paiement effectué avec succès');
-
-        } catch (Exception $e) {
-            return $this->error($e->getMessage(), 400);
+        if (!$user->wallet) {
+            return $this->error('Wallet non trouvé. Veuillez contacter le support.', 404);
         }
+
+        $result = $this->paymentService->makePayment($request->validated());
+
+        return $this->success([
+            'transaction_id' => $result['transaction_id'],
+            'new_balance' => $result['new_balance'],
+            'reference' => $result['reference'],
+        ], 'Paiement effectué avec succès');
+
+    } catch (Exception $e) {
+        return $this->error($e->getMessage(), 400);
     }
+}
+
 
     /**
      * Effectuer un transfert vers un autre utilisateur
@@ -61,8 +68,15 @@ class PaymentController extends Controller
     public function makeTransfer(TransferRequest $request): JsonResponse
     {
         try {
-            $result = $this->paymentService->makeTransfer($request->validated());
+            $user = auth()->user()->loadMissing('wallet'); 
+           
 
+            if (!$user->wallet) {
+                return $this->error('Wallet non trouvé. Veuillez contacter le support.', 404);
+            }
+
+            $result = $this->paymentService->makeTransfer($request->validated());
+          
             return $this->success([
                 'transaction_id' => $result['transaction_id'],
                 'new_balance' => $result['new_balance'],
