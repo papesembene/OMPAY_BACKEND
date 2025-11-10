@@ -35,7 +35,7 @@ class AuthController extends Controller
                 'phone' => $phone
             ];
 
-            // En développement OU si paramètre debug=true, inclure l'OTP dans la réponse
+            // En développement OU si paramètre debug=true (même en production pour tests)
             if (app()->environment('local') || request('debug') === 'true') {
                 $lastOtp = \App\Models\OtpRequest::where('phone', $phone)
                     ->where('used', false)
@@ -45,7 +45,7 @@ class AuthController extends Controller
                 if ($lastOtp) {
                     $response['debug_otp'] = $lastOtp->otp;
                     $response['debug_expires_at'] = $lastOtp->expires_at->toISOString();
-                    $response['debug_message'] = '⚠️ DEBUG MODE: Ce code ne serait pas visible en production';
+                    $response['debug_message'] = '⚠️ DEBUG MODE: Ce code ne serait pas visible en production normale';
                 }
             }
 

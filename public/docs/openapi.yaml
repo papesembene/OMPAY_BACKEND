@@ -18,6 +18,14 @@ paths:
       summary: Demander un OTP pour l'authentification 2FA
       tags:
         - Authentification
+      parameters:
+        - name: debug
+          in: query
+          description: Mode debug pour afficher l'OTP en production (uniquement pour tests)
+          required: false
+          schema:
+            type: string
+            example: "true"
       requestBody:
         required: true
         content:
