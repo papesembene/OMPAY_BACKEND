@@ -14,9 +14,13 @@ RUN apk add --no-cache \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
+    imagemagick \
+    imagemagick-dev \
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
   && docker-php-ext-install pdo pdo_pgsql gd \
-  && apk del postgresql-dev libpng-dev libjpeg-turbo-dev freetype-dev
+  && pecl install imagick \
+  && docker-php-ext-enable imagick \
+  && apk del postgresql-dev libpng-dev libjpeg-turbo-dev freetype-dev imagemagick-dev
 
 WORKDIR /var/www/html
 COPY --from=build /app /var/www/html
