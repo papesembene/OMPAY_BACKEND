@@ -3,7 +3,7 @@ FROM composer:2.6 AS build
 WORKDIR /app
 COPY composer.* ./
 COPY . .
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-req=ext-gd
 
 # Étape 2 : Runtime
 FROM php:8.3-fpm-alpine
