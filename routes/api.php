@@ -33,4 +33,10 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/transaction/payment', [PaymentController::class, 'makePayment']);
     Route::post('/transaction/transfer', [PaymentController::class, 'makeTransfer']);
     Route::get('/qr-payment', [QrCodeController::class, 'generatePaymentQr']);
+
+    // Nouveaux endpoints pour l'historique des transactions
+    Route::prefix('transactions')->group(function () {
+        Route::get('/history', [\App\Http\Controllers\Api\TransactionController::class, 'history']);
+        Route::get('/recent', [\App\Http\Controllers\Api\TransactionController::class, 'recent']);
+    });
 });

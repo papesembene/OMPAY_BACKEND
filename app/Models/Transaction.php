@@ -15,7 +15,13 @@ class Transaction extends Model
 
     protected $fillable = [
         'user_id', 'wallet_id', 'type', 'amount', 'status',
-        'merchant_id', 'recipient_phone', 'orange_tx_id'
+        'marchant_id', 'recipient_phone', 'orange_tx_id'
+    ];
+
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
     ];
 
     protected static function boot()
@@ -39,5 +45,53 @@ class Transaction extends Model
     public function wallet()
     {
         return $this->belongsTo(Wallet::class);
+    }
+
+    /**
+     * Scope pour filtrer par type
+     */
+    public function scopeOfType($query, string $type)
+    {
+        return $query->where('type', $type);
+    }
+
+    /**
+     * Scope pour filtrer par statut
+     */
+    public function scopeOfStatus($query, string $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    /**
+     * Scope pour filtrer par période
+     */
+    public function scopeInDateRange($query, ?string $from = null, ?string $to = null)
+    {
+        if ($from) {
+            $query->whereDate('created_at', '>=', $from);
+        }
+
+        if ($to) {
+            $query->whereDate('created_at', '<=', $to);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Scope pour trier les résultats
+     */
+    public function scopeSorted($query, string $sortBy = 'created_at', string $sortOrder = 'desc')
+    {
+        return $query->orderBy($sortBy, $sortOrder);
+    }
+
+    /**
+     * Scope pour les transactions récentes
+     */
+    public function scopeRecent($query, int $limit = 10)
+    {
+        return $query->orderBy('created_at', 'desc')->limit($limit);
     }
 }
