@@ -5,14 +5,11 @@ FROM composer:2.6 AS build
 
 WORKDIR /app
 
-# Copier uniquement les fichiers nécessaires pour installer les dépendances
-COPY composer.json composer.lock ./
+# Copier le projet complet pour permettre l'exécution des scripts post-install
+COPY . .
 
 # Installer les dépendances PHP sans les dev
 RUN composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-req=ext-gd
-
-# Copier le reste du projet
-COPY . .
 
 # ----------------------------
 # Étape 2 : Runtime
