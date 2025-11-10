@@ -14,9 +14,10 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Migration + Passport
+# Migration + Passport + Seeders
 php artisan migrate --force || echo "Migration probably already done"
 php artisan passport:keys || php artisan passport:install --force
+php artisan db:seed --force || echo "Seeding probably already done"
 
 
 php artisan serve --host=0.0.0.0 --port=10000
