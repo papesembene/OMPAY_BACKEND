@@ -32,8 +32,8 @@ return [
     ],
 
     'orange' => [
-        'client_id' => env('ORANGE_CLIENT_ID', 'gg7IzICvtZkXrPIQD2jLPTfNRabnxSZD'),
-        'client_secret' => env('ORANGE_CLIENT_SECRET', 'Enckahtq5dgVQHChXmaJrt3QoPsg1d8cpldRrkoLitXq'),
+        'client_id' => env('ORANGE_CLIENT_ID'),
+        'client_secret' => env('ORANGE_CLIENT_SECRET'),
     ],
 
 ];
