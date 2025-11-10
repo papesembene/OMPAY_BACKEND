@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\QrCodeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,4 +30,5 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/balance', [PaymentController::class, 'checkBalance']);
     Route::post('/payments', [PaymentController::class, 'makePayment']);
     Route::post('/transfers', [PaymentController::class, 'makeTransfer']);
+    Route::get('/qr-payment', [QrCodeController::class, 'generatePaymentQr']);
 });
