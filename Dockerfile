@@ -11,8 +11,12 @@ FROM php:8.3-fpm-alpine
 RUN apk add --no-cache \
     postgresql-client \
     postgresql-dev \
-  && docker-php-ext-install pdo pdo_pgsql \
-  && apk del postgresql-dev
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+  && docker-php-ext-configure gd --with-freetype --with-jpeg \
+  && docker-php-ext-install pdo pdo_pgsql gd \
+  && apk del postgresql-dev libpng-dev libjpeg-turbo-dev freetype-dev
 
 WORKDIR /var/www/html
 COPY --from=build /app /var/www/html
