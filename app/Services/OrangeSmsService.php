@@ -94,10 +94,10 @@ class OrangeSmsService
                 'Authorization' => "Bearer {$token}",
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
-            ])->post("{$this->baseUrl}/smsmessaging/v1/outbound/tel:+22100000000/requests", [
+            ])->post("{$this->baseUrl}/smsmessaging/v1/outbound/tel:+221317583/requests", [
                 'outboundSMSMessageRequest' => [
                     'address' => "tel:+{$formattedPhone}",
-                    'senderAddress' => 'tel:+22100000000',
+                    'senderAddress' => 'tel:+221317583',
                     'outboundSMSTextMessage' => [
                         'message' => $message
                     ]

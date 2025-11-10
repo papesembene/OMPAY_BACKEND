@@ -13,11 +13,11 @@ servers:
     description: Local
 
 paths:
-  /auth/login:
+  /auth/request-otp:
     post:
-      summary: Connexion utilisateur
+      summary: Demander un OTP pour l'authentification 2FA
       tags:
-        - Auth
+        - Authentification
       requestBody:
         required: true
         content:
@@ -26,41 +26,79 @@ paths:
               type: object
               required:
                 - phone
-                - secret_code
               properties:
                 phone:
                   type: string
                   example: "+221754579919"
-                  description: Numéro Orange Money (utilisateur de test)
-                secret_code:
-                  type: string
-                  example: "1234"
-                  description: Code secret à 4 chiffres (mot de passe par défaut)
+                  description: Numéro de téléphone sénégalais (format +2217XXXXXXX)
       responses:
         '200':
-          description: Connexion réussie
+          description: OTP envoyé avec succès
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginSuccess'
-        '401':
-          description: Identifiants incorrects
+                $ref: '#/components/schemas/OtpRequestSuccess'
+        '400':
+          description: Numéro de téléphone invalide
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '422':
-          description: Validation échouée
+        '404':
+          description: Utilisateur non trouvé
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ErrorResponse'
 
-  /payments:
+  /auth/verify-otp:
+    post:
+      summary: Vérifier l'OTP et obtenir les tokens JWT
+      tags:
+        - Authentification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone
+                - otp
+              properties:
+                phone:
+                  type: string
+                  example: "+221754579919"
+                  description: Numéro de téléphone utilisé pour la demande OTP
+                otp:
+                  type: string
+                  example: "123456"
+                  description: Code OTP à 6 chiffres reçu par SMS
+      responses:
+        '200':
+          description: Authentification réussie - Tokens JWT générés
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OtpVerifySuccess'
+        '401':
+          description: Code OTP invalide ou expiré
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Utilisateur non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /transaction/payment:
     post:
       summary: Effectuer un paiement vers un marchand
       tags:
-        - Payments
+        - Transactions
       security:
         - bearerAuth: []
       requestBody:
@@ -130,11 +168,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /transfers:
+  /transaction/transfer:
     post:
       summary: Effectuer un transfert vers un autre utilisateur
       tags:
-        - Transfers
+        - Transactions
       security:
         - bearerAuth: []
       requestBody:
@@ -343,6 +381,59 @@ components:
             reference:
               type: string
               example: "TX202511091234567891"
+        timestamp:
+          type: string
+          format: date-time
+
+    OtpRequestSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Code OTP envoyé avec succès"
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Code OTP envoyé avec succès"
+            phone:
+              type: string
+              example: "+221754579919"
+        timestamp:
+          type: string
+          format: date-time
+
+    OtpVerifySuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Authentification réussie"
+        data:
+          type: object
+          properties:
+            access_token:
+              type: string
+              description: Token JWT d'accès (valable 1 heure)
+              example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9..."
+            refresh_token:
+              type: string
+              description: Token de rafraîchissement (valable 30 jours)
+              example: "uuid_du_refresh_token"
+            token_type:
+              type: string
+              example: "Bearer"
+            expires_in:
+              type: integer
+              description: Durée de validité en secondes
+              example: 3600
         timestamp:
           type: string
           format: date-time

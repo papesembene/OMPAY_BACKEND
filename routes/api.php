@@ -21,14 +21,16 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-// Routes publiques
-Route::post('/auth/login', [AuthController::class, 'login']);
+// Routes publiques - Authentification 2FA uniquement
+Route::post('/auth/request-otp', [AuthController::class, 'requestOtp']);
+Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp']);
+// Route::post('/auth/login', [AuthController::class, 'login']); // Commenté - Plus utilisé
 
 // Routes protégées
 Route::middleware('auth:api')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/balance', [PaymentController::class, 'checkBalance']);
-    Route::post('/payments', [PaymentController::class, 'makePayment']);
-    Route::post('/transfers', [PaymentController::class, 'makeTransfer']);
+    Route::post('/transaction/payment', [PaymentController::class, 'makePayment']);
+    Route::post('/transaction/transfer', [PaymentController::class, 'makeTransfer']);
     Route::get('/qr-payment', [QrCodeController::class, 'generatePaymentQr']);
 });

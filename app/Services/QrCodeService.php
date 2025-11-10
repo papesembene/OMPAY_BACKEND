@@ -28,7 +28,7 @@ class QrCodeService
                 'data_length' => strlen($qrData)
             ]);
 
-            // Générer le QR code en base64
+            // Générer le QR code en base64 avec GD (disponible)
             $qrCode = QrCode::format('png')
                 ->size(300)
                 ->margin(4)

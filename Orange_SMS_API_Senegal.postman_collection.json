@@ -1,0 +1,380 @@
+{
+  "info": {
+    "name": "Orange SMS API Senegal - Collection Complète",
+    "description": "Collection Postman pour l'API SMS Orange Senegal avec tous les endpoints disponibles",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.orange.com",
+      "type": "string"
+    },
+    {
+      "key": "client_id",
+      "value": "VOTRE_CLIENT_ID",
+      "type": "string"
+    },
+    {
+      "key": "client_secret",
+      "value": "VOTRE_CLIENT_SECRET",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sender_address",
+      "value": "tel:+221317583",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentification",
+      "item": [
+        {
+          "name": "Obtenir Access Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic {{client_credentials}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "grant_type=client_credentials"
+            },
+            "url": {
+              "raw": "{{base_url}}/oauth/v3/token",
+              "host": ["{{base_url}}"],
+              "path": ["oauth", "v3", "token"]
+            },
+            "description": "Obtenir un token d'accès pour utiliser l'API SMS"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', jsonData.access_token);",
+                  "    console.log('Token obtenu:', jsonData.access_token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Gestion des Contrats",
+      "item": [
+        {
+          "name": "Consulter les Contrats SMS",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sms/admin/v1/contracts",
+              "host": ["{{base_url}}"],
+              "path": ["sms", "admin", "v1", "contracts"]
+            },
+            "description": "Consulter vos contrats SMS et votre balance restante"
+          }
+        },
+        {
+          "name": "Détails d'un Contrat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sms/admin/v1/contracts/{contract_id}",
+              "host": ["{{base_url}}"],
+              "path": ["sms", "admin", "v1", "contracts", "{contract_id}"],
+              "variable": [
+                {
+                  "key": "contract_id",
+                  "value": "VOTRE_CONTRACT_ID",
+                  "description": "ID du contrat SMS"
+                }
+              ]
+            },
+            "description": "Obtenir les détails d'un contrat spécifique"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Envoi de SMS",
+      "item": [
+        {
+          "name": "Envoyer un SMS Simple",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"outboundSMSMessageRequest\": {\n    \"address\": \"tel:+221XXXXXXXXX\",\n    \"senderAddress\": \"{{sender_address}}\",\n    \"outboundSMSTextMessage\": {\n      \"message\": \"Test SMS depuis Orange API\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/smsmessaging/v1/outbound/{{sender_address}}/requests",
+              "host": ["{{base_url}}"],
+              "path": ["smsmessaging", "v1", "outbound", "{{sender_address}}", "requests"]
+            },
+            "description": "Envoyer un SMS simple à un destinataire"
+          }
+        },
+        {
+          "name": "Envoyer SMS avec Callback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"outboundSMSMessageRequest\": {\n    \"address\": \"tel:+221XXXXXXXXX\",\n    \"senderAddress\": \"{{sender_address}}\",\n    \"outboundSMSTextMessage\": {\n      \"message\": \"SMS avec callback\"\n    },\n    \"receiptRequest\": {\n      \"notifyURL\": \"https://votre-domaine.com/callback\",\n      \"callbackData\": \"reference_123\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/smsmessaging/v1/outbound/{{sender_address}}/requests",
+              "host": ["{{base_url}}"],
+              "path": ["smsmessaging", "v1", "outbound", "{{sender_address}}", "requests"]
+            },
+            "description": "Envoyer un SMS avec notification de livraison (DLR)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Historique et Statut",
+      "item": [
+        {
+          "name": "Consulter l'Historique des SMS",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sms/admin/v1/usage?country=SEN",
+              "host": ["{{base_url}}"],
+              "path": ["sms", "admin", "v1", "usage"],
+              "query": [
+                {
+                  "key": "country",
+                  "value": "SEN",
+                  "description": "Code pays (SEN pour Sénégal)"
+                }
+              ]
+            },
+            "description": "Consulter l'historique d'utilisation des SMS"
+          }
+        },
+        {
+          "name": "Statut d'un SMS",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/smsmessaging/v1/outbound/{{sender_address}}/requests/{request_id}",
+              "host": ["{{base_url}}"],
+              "path": ["smsmessaging", "v1", "outbound", "{{sender_address}}", "requests", "{request_id}"],
+              "variable": [
+                {
+                  "key": "request_id",
+                  "value": "VOTRE_REQUEST_ID",
+                  "description": "ID de la requête SMS"
+                }
+              ]
+            },
+            "description": "Vérifier le statut de livraison d'un SMS"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Configuration",
+      "item": [
+        {
+          "name": "Configurer DLR Callback",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryReceipt\": {\n    \"notifyURL\": \"https://votre-domaine.com/dlr-callback\",\n    \"notifyURLAuthToken\": \"votre_token_optionnel\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/sms/admin/v1/deliveryReceipts",
+              "host": ["{{base_url}}"],
+              "path": ["sms", "admin", "v1", "deliveryReceipts"]
+            },
+            "description": "Configurer l'URL de callback pour les accusés de réception"
+          }
+        },
+        {
+          "name": "Configurer SMS MO Callback",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notificationChannel\": {\n    \"channelType\": \"WEBHOOK\",\n    \"webhook\": {\n      \"notifyURL\": \"https://votre-domaine.com/mo-callback\",\n      \"notifyURLAuthToken\": \"votre_token_optionnel\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/sms/admin/v1/inbound",
+              "host": ["{{base_url}}"],
+              "path": ["sms", "admin", "v1", "inbound"]
+            },
+            "description": "Configurer l'URL de callback pour les SMS entrants (MO)"
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Générer les credentials encodés en base64",
+          "const credentials = btoa(pm.collectionVariables.get('client_id') + ':' + pm.collectionVariables.get('client_secret'));",
+          "pm.collectionVariables.set('client_credentials', credentials);"
+        ]
+      }
+    }
+  ]
+}
