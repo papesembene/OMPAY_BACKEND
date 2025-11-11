@@ -22,12 +22,12 @@
     },
     {
       "key": "client_id",
-      "value": "VOTRE_CLIENT_ID",
+      "value": "SxSKVRFXB7JQJuvOZpkM9UaNAaLrTRRu",
       "type": "string"
     },
     {
       "key": "client_secret",
-      "value": "VOTRE_CLIENT_SECRET",
+      "value": "yyox8DqjCjdCkBl2XPKBuQFluGcorBRyeW9VictalAZK",
       "type": "string"
     },
     {
@@ -37,7 +37,7 @@
     },
     {
       "key": "sender_address",
-      "value": "tel:+221317583",
+      "value": "",
       "type": "string"
     }
   ],
@@ -119,7 +119,27 @@
               "path": ["sms", "admin", "v1", "contracts"]
             },
             "description": "Consulter vos contrats SMS et votre balance restante"
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData && jsonData.length > 0) {",
+                  "        // Pour ce format de réponse, l'adresse expéditeur n'est pas directement disponible",
+                  "        // Utilisez une valeur par défaut ou contactez Orange pour obtenir l'adresse expéditeur",
+                  "        console.log('Contrat trouvé, mais adresse expéditeur non disponible dans cette réponse');",
+                  "        console.log('Contactez Orange pour obtenir votre adresse expéditeur');",
+                  "    } else {",
+                  "        console.log('Aucun contrat trouvé');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Détails d'un Contrat",

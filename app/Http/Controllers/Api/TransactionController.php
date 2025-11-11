@@ -35,15 +35,14 @@ class TransactionController extends Controller
 
             // Pagination
             $perPage = $validated['per_page'] ?? 20;
-            $transactions = $query->paginate($perPage);
+            $paginatedTransactions = $query->paginate($perPage);
 
             // Récupérer les paramètres de tri pour la réponse
             $sortBy = $validated['sort_by'] ?? 'created_at';
             $sortOrder = $validated['sort_order'] ?? 'desc';
 
             // Formater les données
-            $formattedTransactions = $transactions->items();
-            $formattedTransactions = collect($formattedTransactions)->map(function ($transaction) {
+            $formattedItems = collect($paginatedTransactions->items())->map(function ($transaction) {
                 return [
                     'id' => $transaction->id,
                     'type' => $transaction->type,
@@ -62,14 +61,14 @@ class TransactionController extends Controller
             });
 
             return $this->success([
-                'transactions' => $formattedTransactions->items(),
+                'transactions' => $formattedItems,
                 'pagination' => [
-                    'current_page' => $formattedTransactions->currentPage(),
-                    'last_page' => $formattedTransactions->lastPage(),
-                    'per_page' => $formattedTransactions->perPage(),
-                    'total' => $formattedTransactions->total(),
-                    'from' => $formattedTransactions->firstItem(),
-                    'to' => $formattedTransactions->lastItem()
+                    'current_page' => $paginatedTransactions->currentPage(),
+                    'last_page' => $paginatedTransactions->lastPage(),
+                    'per_page' => $paginatedTransactions->perPage(),
+                    'total' => $paginatedTransactions->total(),
+                    'from' => $paginatedTransactions->firstItem(),
+                    'to' => $paginatedTransactions->lastItem()
                 ],
                 'filters' => [
                     'type' => $request->validated()['type'] ?? null,
