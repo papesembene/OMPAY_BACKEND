@@ -7,8 +7,10 @@ use App\Http\Requests\RequestOtpRequest;
 use App\Http\Requests\VerifyOtpRequest;
 use App\Models\User;
 use App\Services\OtpService;
+use App\Services\UserProfileService;
 use App\Http\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Laravel\Passport\Token;
 use Exception;
@@ -18,7 +20,8 @@ class AuthController extends Controller
     use ApiResponseTrait;
 
     public function __construct(
-        protected OtpService $otpService
+        protected OtpService $otpService,
+        protected UserProfileService $userProfileService
     ) {}
 
     /**
@@ -113,6 +116,31 @@ class AuthController extends Controller
 
             return $this->error(
                 'Erreur lors de la vérification du code OTP',
+                500
+            );
+        }
+    }
+
+    /**
+     * Récupérer le profil complet de l'utilisateur connecté
+     */
+    public function me(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            $profileData = $this->userProfileService->getCompleteProfile($user);
+
+            return $this->success($profileData, 'Profil utilisateur récupéré avec succès');
+
+        } catch (Exception $e) {
+            Log::error('Erreur récupération profil', [
+                'user_id' => $request->user()->id ?? 'unknown',
+                'error' => $e->getMessage()
+            ]);
+
+            return $this->error(
+                'Erreur lors de la récupération du profil',
                 500
             );
         }

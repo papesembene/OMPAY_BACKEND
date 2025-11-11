@@ -28,6 +28,8 @@ Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp']);
 
 // Routes protégées
 Route::middleware('auth:api')->group(function () {
+    Route::get('/auth/me', [AuthController::class, 'me']);
+    Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/balance', [PaymentController::class, 'checkBalance']);
     Route::get('/balance/{reference}', [PaymentController::class, 'checkWalletBalance']);

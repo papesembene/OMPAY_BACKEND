@@ -102,6 +102,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /auth/me:
+    get:
+      summary: Récupérer le profil complet de l'utilisateur connecté
+      tags:
+        - Authentification
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profil utilisateur récupéré avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileSuccess'
+        '401':
+          description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /transaction/payment:
     post:
       summary: Effectuer un paiement vers un marchand
@@ -667,6 +688,90 @@ components:
               type: integer
               description: Durée de validité en secondes
               example: 3600
+        timestamp:
+          type: string
+          format: date-time
+
+    UserProfileSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Profil utilisateur récupéré avec succès"
+        data:
+          type: object
+          properties:
+            user:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  example: "12345678-1234-1234-1234-123456789012"
+                name:
+                  type: string
+                  example: "Pape Sembene"
+                phone:
+                  type: string
+                  example: "+221754579919"
+            wallets:
+              type: array
+              items:
+                type: object
+                properties:
+                  reference:
+                    type: string
+                    example: "principal"
+                  label:
+                    type: string
+                    example: "Compte Principal"
+                  balance:
+                    type: number
+                    example: 10000.00
+                  currency:
+                    type: string
+                    example: "XOF"
+                  is_primary:
+                    type: boolean
+                    example: true
+            recent_transactions:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    example: "12345678-1234-1234-1234-123456789012"
+                  signed_amount:
+                    type: string
+                    example: "-5 000 FCFA"
+                  sender:
+                    type: string
+                    example: "Pape Sembene (+221771234567)"
+                  recipient:
+                    type: string
+                    example: "Test Merchant (MCH123456)"
+                  description:
+                    type: string
+                    example: "Paiement effectué vers Test Merchant"
+                  status:
+                    type: string
+                    example: "success"
+                  reference:
+                    type: string
+                    example: "TX202511091234567890"
+                  created_at:
+                    type: string
+                    format: date-time
+                    example: "2025-11-10T09:30:19.000000Z"
+                  updated_at:
+                    type: string
+                    format: date-time
+                    example: "2025-11-10T09:30:19.000000Z"
         timestamp:
           type: string
           format: date-time
