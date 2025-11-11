@@ -11,9 +11,10 @@ class TransactionService implements TransactionServiceInterface
      * Créer une transaction de paiement
      *
      * @param array $data
+     * @param \App\Models\Wallet|null $wallet
      * @return Transaction
      */
-    public function createPayment(array $data): Transaction
+    public function createPayment(array $data, ?\App\Models\Wallet $wallet = null): Transaction
     {
         // Trouver le marchand par code ou téléphone
         $merchant = null;
@@ -24,13 +25,22 @@ class TransactionService implements TransactionServiceInterface
         }
 
         $user = auth()->user();
-        if (!$user || !$user->wallet) {
-            throw new \Exception('Utilisateur ou wallet non trouvé');
+        if (!$user) {
+            throw new \Exception('Utilisateur non trouvé');
+        }
+
+        // Utiliser le wallet passé en paramètre ou récupérer celui par défaut
+        if (!$wallet) {
+            $wallet = $user->wallet()->first();
+        }
+
+        if (!$wallet) {
+            throw new \Exception('Wallet non trouvé');
         }
 
         return Transaction::create([
             'user_id' => $user->id,
-            'wallet_id' => $user->wallet->id,
+            'wallet_id' => $wallet->id,
             'amount' => $data['amount'],
             'type' => 'payment',
             'status' => 'success',
@@ -44,18 +54,28 @@ class TransactionService implements TransactionServiceInterface
      * Créer une transaction de transfert
      *
      * @param array $data
+     * @param \App\Models\Wallet|null $wallet
      * @return Transaction
      */
-    public function createTransfer(array $data): Transaction
+    public function createTransfer(array $data, ?\App\Models\Wallet $wallet = null): Transaction
     {
         $user = auth()->user();
-        if (!$user || !$user->wallet) {
-            throw new \Exception('Utilisateur ou wallet non trouvé');
+        if (!$user) {
+            throw new \Exception('Utilisateur non trouvé');
+        }
+
+        // Utiliser le wallet passé en paramètre ou récupérer celui par défaut
+        if (!$wallet) {
+            $wallet = $user->wallet()->first();
+        }
+
+        if (!$wallet) {
+            throw new \Exception('Wallet non trouvé');
         }
 
         return Transaction::create([
             'user_id' => $user->id,
-            'wallet_id' => $user->wallet->id,
+            'wallet_id' => $wallet->id,
             'amount' => $data['amount'],
             'type' => 'transfer',
             'status' => 'success',

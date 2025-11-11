@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TransactionHistoryRequest;
 use App\Models\Transaction;
+use App\Http\Resources\TransactionResource;
 use App\Http\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Exception;
@@ -41,24 +42,8 @@ class TransactionController extends Controller
             $sortBy = $validated['sort_by'] ?? 'created_at';
             $sortOrder = $validated['sort_order'] ?? 'desc';
 
-            // Formater les données
-            $formattedItems = collect($paginatedTransactions->items())->map(function ($transaction) {
-                return [
-                    'id' => $transaction->id,
-                    'type' => $transaction->type,
-                    'amount' => $transaction->amount,
-                    'status' => $transaction->status,
-                    'reference' => $transaction->orange_tx_id,
-                    'recipient_phone' => $transaction->recipient_phone,
-                    'merchant' => $transaction->marchant ? [
-                        'id' => $transaction->marchant->id,
-                        'name' => $transaction->marchant->name,
-                        'code' => $transaction->marchant->code
-                    ] : null,
-                    'created_at' => $transaction->created_at->toISOString(),
-                    'updated_at' => $transaction->updated_at->toISOString()
-                ];
-            });
+            // Formater les données avec TransactionResource
+            $formattedItems = TransactionResource::collection($paginatedTransactions->items());
 
             return $this->success([
                 'transactions' => $formattedItems,
@@ -101,24 +86,8 @@ class TransactionController extends Controller
                 ->recent(10) // Utilisation du scope pour un code plus propre
                 ->get();
 
-            // Formater les données
-            $formattedTransactions = $transactions->map(function ($transaction) {
-                return [
-                    'id' => $transaction->id,
-                    'type' => $transaction->type,
-                    'amount' => $transaction->amount,
-                    'status' => $transaction->status,
-                    'reference' => $transaction->orange_tx_id,
-                    'recipient_phone' => $transaction->recipient_phone,
-                    'merchant' => $transaction->marchant ? [
-                        'id' => $transaction->marchant->id,
-                        'name' => $transaction->marchant->name,
-                        'code' => $transaction->marchant->code
-                    ] : null,
-                    'created_at' => $transaction->created_at->toISOString(),
-                    'updated_at' => $transaction->updated_at->toISOString()
-                ];
-            });
+            // Formater les données avec TransactionResource
+            $formattedTransactions = TransactionResource::collection($transactions);
 
             return $this->success([
                 'transactions' => $formattedTransactions,

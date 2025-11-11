@@ -25,24 +25,29 @@ class PaymentService implements PaymentServiceInterface
      * Effectuer un paiement vers un marchand
      *
      * @param array $data
+     * @param \App\Models\Wallet|null $wallet
      * @return array
      * @throws Exception
      */
-    public function makePayment(array $data): array
+    public function makePayment(array $data, ?\App\Models\Wallet $wallet = null): array
     {
-        return DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($data, $wallet) {
             $user = auth()->user();
            if (!$user) {
             throw new Exception('Utilisateur non authentifié');
         }
-        
-        Log::info('User ID: ' . $user->id);
-        Log::info('Wallet: ', ['wallet' => $user->wallet]);
+
+        // Utiliser le wallet passé en paramètre ou récupérer celui par défaut
+        if (!$wallet) {
             $wallet = $user->wallet()->first();
-            
-            if (!$wallet) {
-                throw new Exception('Portefeuille non trouvé. Veuillez contacter le support.');
-            }
+        }
+
+        Log::info('User ID: ' . $user->id);
+        Log::info('Wallet: ', ['wallet' => $wallet]);
+
+        if (!$wallet) {
+            throw new Exception('Portefeuille non trouvé. Veuillez contacter le support.');
+        }
 
             // Vérifier que le solde est suffisant
             \Illuminate\Support\Facades\Log::info('Balance check', [
@@ -62,7 +67,7 @@ class PaymentService implements PaymentServiceInterface
             $ancienSolde = $this->walletService->debit($wallet, $data['amount']);
 
             // 3. Créer la transaction
-            $transaction = $this->transactionService->createPayment($data);
+            $transaction = $this->transactionService->createPayment($data, $wallet);
 
             // 4. Notifier
             $this->notificationService->notifyPayment($transaction);
@@ -79,66 +84,68 @@ class PaymentService implements PaymentServiceInterface
      * Effectuer un transfert vers un autre utilisateur
      *
      * @param array $data
+     * @param \App\Models\Wallet|null $walletSender
      * @return array
      * @throws Exception
      */
-    public function makeTransfer(array $data): array
-{
-    return DB::transaction(function () use ($data) {
-        // Récupérer l'utilisateur authentifié
-        $user = auth()->user();
-        
-        if (!$user) {
-            throw new Exception('Utilisateur non authentifié');
-        }
+    public function makeTransfer(array $data, ?\App\Models\Wallet $walletSender = null): array
+    {
+        return DB::transaction(function () use ($data, $walletSender) {
+            // Récupérer l'utilisateur authentifié
+            $user = auth()->user();
 
-        // Charger le wallet de l'expéditeur avec sécurité
-        $user->loadMissing('wallet');
-        $walletSender = $user->wallet;
-          
-        if (!$walletSender) {
-            throw new Exception('Portefeuille expéditeur introuvable.');
-        }
+            if (!$user) {
+                throw new Exception('Utilisateur non authentifié');
+            }
 
-        // Vérifier le solde de l'expéditeur
-        if ($walletSender->balance < $data['amount']) {
-            throw new Exception('Solde insuffisant.');
-        }
+            // Utiliser le wallet passé en paramètre ou récupérer celui par défaut
+            if (!$walletSender) {
+                $walletSender = $user->wallet()->first();
+            }
 
-        // Récupérer le destinataire avec son wallet
-        $recipient = User::with('wallet')->where('phone', $data['recipient_phone'])->first();
-       
-        if (!$recipient) {
-            throw new Exception('Destinataire introuvable.');
-        }
-        $walletRecipient = $recipient->wallet;
-        if (!$walletRecipient) {
-            throw new Exception('Portefeuille destinataire introuvable.');
-        }
-        
+            if (!$walletSender) {
+                throw new Exception('Portefeuille expéditeur introuvable.');
+            }
 
-        // 1. Vérifier les autorisations
-        $this->authorizationService->checkTransferAuthorization($data);
+            // Vérifier le solde de l'expéditeur
+            if ($walletSender->balance < $data['amount']) {
+                throw new Exception('Solde insuffisant.');
+            }
 
-        // 2. Débiter l'expéditeur et créditer le destinataire
-        $this->walletService->debit($walletSender, $data['amount']);
-        $this->walletService->credit($walletRecipient, $data['amount']);
+            // Récupérer le destinataire avec son wallet
+            $recipient = User::with('wallet')->where('phone', $data['recipient_phone'])->first();
 
-        // 3. Créer la transaction
-        $transaction = $this->transactionService->createTransfer($data);
-        
+            if (!$recipient) {
+                throw new Exception('Destinataire introuvable.');
+            }
+            $walletRecipient = $recipient->wallet;
+            if (!$walletRecipient) {
+                throw new Exception('Portefeuille destinataire introuvable.');
+            }
 
-        // 4. Notifier
-        $this->notificationService->notifyTransfer($transaction);
 
-        // 5. Retourner les infos
-        return [
-            'transaction_id' => $transaction->id,
-            'new_balance' => $walletSender->balance,
-            'reference' => $transaction->orange_tx_id,
-        ];
-    });
-}
+            // 1. Vérifier les autorisations
+            $this->authorizationService->checkTransferAuthorization($data);
+
+            // 2. Débiter l'expéditeur et créditer le destinataire
+            $this->walletService->debit($walletSender, $data['amount']);
+            $this->walletService->credit($walletRecipient, $data['amount']);
+
+            // 3. Créer la transaction
+            $transaction = $this->transactionService->createTransfer($data, $walletSender);
+
+
+            // 4. Notifier
+            $this->notificationService->notifyTransfer($transaction);
+
+            // 5. Retourner les infos
+            return [
+                'transaction_id' => $transaction->id,
+                'new_balance' => $walletSender->balance,
+                'reference' => $transaction->orange_tx_id,
+            ];
+        });
+    }
 
 
 

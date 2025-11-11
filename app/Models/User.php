@@ -39,4 +39,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Wallet::class, 'user_id', 'id');
     }
+
+    public function wallets()
+    {
+        return $this->hasMany(Wallet::class, 'user_id', 'id');
+    }
 }

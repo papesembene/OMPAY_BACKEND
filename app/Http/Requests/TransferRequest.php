@@ -27,7 +27,7 @@ class TransferRequest extends FormRequest
                 'required',
                 'string',
                 'regex:/^(\+221)?(70|71|75|76|77|78)[0-9]{7}$/',
-               
+
             ],
             'description' => 'nullable|string|max:255',
         ];

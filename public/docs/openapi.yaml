@@ -157,20 +157,26 @@ paths:
 
   /balance:
     get:
-      summary: Vérifier le solde du wallet
+      summary: Vérifier les soldes des wallets
       tags:
         - Wallet
       security:
         - bearerAuth: []
       responses:
         '200':
-          description: Solde récupéré avec succès
+          description: Soldes récupérés avec succès
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/BalanceSuccess'
         '401':
           description: Non authentifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Aucun wallet trouvé
           content:
             application/json:
               schema:
@@ -439,11 +445,27 @@ components:
         data:
           type: object
           properties:
-            transaction_id:
+            id_transaction:
               type: string
               format: uuid
               example: "026f31bb-2746-4c8a-a54b-cd2a7a44b13a"
-            new_balance:
+            montant_signe:
+              type: string
+              example: "-5 000 FCFA"
+            expediteur:
+              type: string
+              example: "Pape Sembene"
+            numero_expediteur:
+              type: string
+              example: "+221771234567"
+            destinataire:
+              type: string
+              example: "Auchan Sandaga"
+            numero_destinataire:
+              type: string
+              nullable: true
+              example: "+221701234567"
+            nouveau_solde:
               type: number
               example: 10000
             reference:
@@ -461,16 +483,36 @@ components:
           example: true
         message:
           type: string
-          example: "Solde récupéré avec succès"
+          example: "Soldes récupérés avec succès"
         data:
           type: object
           properties:
-            balance:
+            wallets:
+              type: array
+              items:
+                type: object
+                properties:
+                  reference:
+                    type: string
+                    example: "principal"
+                  label:
+                    type: string
+                    example: "Compte Principal"
+                  balance:
+                    type: number
+                    example: 15000
+                  currency:
+                    type: string
+                    example: "XOF"
+                  is_primary:
+                    type: boolean
+                    example: true
+            total_balance:
               type: number
-              example: 15000
+              example: 65000
             currency:
               type: string
-              example: "FCFA"
+              example: "XOF"
         timestamp:
           type: string
           format: date-time
@@ -487,11 +529,26 @@ components:
         data:
           type: object
           properties:
-            transaction_id:
+            id_transaction:
               type: string
               format: uuid
               example: "12345678-1234-1234-1234-123456789012"
-            new_balance:
+            montant_signe:
+              type: string
+              example: "-2 000 FCFA"
+            expediteur:
+              type: string
+              example: "Pape Sembene"
+            numero_expediteur:
+              type: string
+              example: "+221771234567"
+            destinataire:
+              type: string
+              example: "Awa Diop"
+            numero_destinataire:
+              type: string
+              example: "+221781112233"
+            nouveau_solde:
               type: number
               example: 10000
             reference:
@@ -682,14 +739,18 @@ components:
           type: string
           format: uuid
           example: "12345678-1234-1234-1234-123456789012"
-        type:
+        signed_amount:
           type: string
-          enum: [payment, transfer]
-          example: "transfer"
-        amount:
-          type: number
-          format: decimal
-          example: 2500.00
+          example: "-2 500 FCFA"
+        sender:
+          type: string
+          example: "Pape Sembene (+221771234567)"
+        recipient:
+          type: string
+          example: "Awa Diop (+221781112233)"
+        description:
+          type: string
+          example: "Transfert envoyé vers +221781112233"
         status:
           type: string
           enum: [pending, success, failed]
@@ -698,24 +759,6 @@ components:
           type: string
           nullable: true
           example: "TX202511091234567891"
-        recipient_phone:
-          type: string
-          nullable: true
-          example: "+221788888888"
-        merchant:
-          type: object
-          nullable: true
-          properties:
-            id:
-              type: string
-              format: uuid
-              example: "87654321-4321-4321-4321-210987654321"
-            name:
-              type: string
-              example: "Orange Shop"
-            code:
-              type: string
-              example: "MCH123456"
         created_at:
           type: string
           format: date-time
