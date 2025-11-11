@@ -30,8 +30,6 @@ class PaymentController extends Controller
             return $this->error('Aucun wallet trouvé', 404);
         }
 
-        $totalBalance = $wallets->sum('balance');
-
         return $this->success([
             'wallets' => $wallets->map(function($wallet) {
                 return [
@@ -41,10 +39,29 @@ class PaymentController extends Controller
                     'currency' => $wallet->currency,
                     'is_primary' => $wallet->is_primary
                 ];
-            }),
-            'total_balance' => $totalBalance,
-            'currency' => 'XOF'
+            })
         ], 'Soldes récupérés avec succès');
+    }
+
+    /**
+     * Vérifier le solde d'un wallet spécifique
+     */
+    public function checkWalletBalance(string $reference): JsonResponse
+    {
+        $user = auth()->user();
+        $wallet = $user->wallets()->where('reference', $reference)->first();
+
+        if (!$wallet) {
+            return $this->error('Wallet non trouvé ou accès non autorisé', 404);
+        }
+
+        return $this->success([
+            'reference' => $wallet->reference,
+            'label' => $wallet->label,
+            'balance' => $wallet->balance,
+            'currency' => $wallet->currency,
+            'is_primary' => $wallet->is_primary
+        ], 'Solde du wallet récupéré avec succès');
     }
 
     /**

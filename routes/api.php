@@ -30,6 +30,7 @@ Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp']);
 Route::middleware('auth:api')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/balance', [PaymentController::class, 'checkBalance']);
+    Route::get('/balance/{reference}', [PaymentController::class, 'checkWalletBalance']);
     Route::post('/transaction/payment', [PaymentController::class, 'makePayment']);
     Route::post('/transaction/transfer', [PaymentController::class, 'makeTransfer']);
     Route::get('/qr-payment', [QrCodeController::class, 'generatePaymentQr']);
