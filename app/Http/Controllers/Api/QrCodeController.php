@@ -18,22 +18,23 @@ class QrCodeController extends Controller
     ) {}
 
     /**
-     * Génère un QR code de paiement pour l'utilisateur connecté
+     * Génère un QR code de paiement pour un wallet spécifique
      */
-    public function generatePaymentQr(GenerateQrRequest $request): JsonResponse
+    public function generatePaymentQr(GenerateQrRequest $request, string $reference): JsonResponse
     {
         try {
-            $user = auth()->user()->load('wallet');
+            $user = auth()->user();
+            $wallet = \App\Models\Wallet::where('user_id', $user->id)->where('reference', $reference)->first();
 
-            if (!$user->wallet) {
-                return $this->error('Wallet non trouvé. Veuillez contacter le support.', 404);
+            if (!$wallet) {
+                return $this->error('Wallet non trouvé ou accès non autorisé', 404);
             }
 
-            $qrCodeBase64 = $this->qrCodeService->generatePaymentQr($user->wallet->id);
+            $qrCodeBase64 = $this->qrCodeService->generatePaymentQr($wallet->id);
 
             return $this->success([
                 'qr_code' => $qrCodeBase64,
-                'wallet_id' => $user->wallet->id,
+                'wallet_id' => $wallet->id,
                 'format' => 'base64',
                 'mime_type' => 'image/png'
             ], 'QR code de paiement généré avec succès');

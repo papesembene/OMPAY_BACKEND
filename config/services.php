@@ -34,6 +34,7 @@ return [
     'orange' => [
         'client_id' => env('ORANGE_CLIENT_ID'),
         'client_secret' => env('ORANGE_CLIENT_SECRET'),
+        'sender_number' => env('ORANGE_SENDER_NUMBER', '+221317583'), // Numéro Orange pour l'envoi de SMS
     ],
 
 ];

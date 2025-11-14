@@ -29,15 +29,19 @@ Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp']);
 // Routes protégées
 Route::middleware('auth:api')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
-    Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
-    Route::get('/balance', [PaymentController::class, 'checkBalance']);
-    Route::get('/balance/{reference}', [PaymentController::class, 'checkWalletBalance']);
-    Route::post('/transaction/payment', [PaymentController::class, 'makePayment']);
-    Route::post('/transaction/transfer', [PaymentController::class, 'makeTransfer']);
-    Route::get('/qr-payment', [QrCodeController::class, 'generatePaymentQr']);
 
-    // Nouveaux endpoints pour l'historique des transactions
+    // Wallets
+    Route::get('/wallets', [PaymentController::class, 'checkBalance']);
+    Route::get('/wallet/{reference}', [PaymentController::class, 'checkWalletBalance']);
+    Route::get('/balance/{reference}', [PaymentController::class, 'checkWalletBalance']); // Alias pour compatibilité
+
+    // Transactions par wallet
+    Route::post('/wallet/{reference}/payment', [PaymentController::class, 'makePayment']);
+    Route::post('/wallet/{reference}/transfer', [PaymentController::class, 'makeTransfer']);
+    Route::get('/wallet/{reference}/qr-payment', [QrCodeController::class, 'generatePaymentQr']);
+
+    // Historique des transactions
     Route::prefix('transactions')->group(function () {
         Route::get('/history', [\App\Http\Controllers\Api\TransactionController::class, 'history']);
         Route::get('/recent', [\App\Http\Controllers\Api\TransactionController::class, 'recent']);

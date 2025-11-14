@@ -24,7 +24,7 @@ class PaymentController extends Controller
     public function checkBalance(): JsonResponse
     {
         $user = auth()->user();
-        $wallets = $user->wallets()->get();
+        $wallets = \App\Models\Wallet::where('user_id', $user->id)->get();
 
         if ($wallets->isEmpty()) {
             return $this->error('Aucun wallet trouvé', 404);
@@ -49,7 +49,7 @@ class PaymentController extends Controller
     public function checkWalletBalance(string $reference): JsonResponse
     {
         $user = auth()->user();
-        $wallet = $user->wallets()->where('reference', $reference)->first();
+        $wallet = \App\Models\Wallet::where('user_id', $user->id)->where('reference', $reference)->first();
 
         if (!$wallet) {
             return $this->error('Wallet non trouvé ou accès non autorisé', 404);
@@ -65,19 +65,19 @@ class PaymentController extends Controller
     }
 
     /**
-     * Effectuer un paiement vers un marchand
+     * Effectuer un paiement vers un marchand depuis un wallet spécifique
      */
-    public function makePayment(PaymentRequest $request): JsonResponse
+    public function makePayment(PaymentRequest $request, string $reference): JsonResponse
     {
         try {
             $user = auth()->user();
             $validated = $request->validated();
 
-            // Utiliser le wallet principal par défaut (backward compatibility)
-            $wallet = $user->wallets()->where('is_primary', true)->first();
+            // Récupérer le wallet spécifié
+            $wallet = \App\Models\Wallet::where('user_id', $user->id)->where('reference', $reference)->first();
 
             if (!$wallet) {
-                return $this->error('Wallet principal non trouvé. Veuillez contacter le support.', 404);
+                return $this->error('Wallet non trouvé ou accès non autorisé', 404);
             }
 
             $result = $this->paymentService->makePayment($validated, $wallet);
@@ -108,19 +108,19 @@ class PaymentController extends Controller
 
 
     /**
-     * Effectuer un transfert vers un autre utilisateur
+     * Effectuer un transfert vers un autre utilisateur depuis un wallet spécifique
      */
-    public function makeTransfer(TransferRequest $request): JsonResponse
+    public function makeTransfer(TransferRequest $request, string $reference): JsonResponse
     {
         try {
             $user = auth()->user();
             $validated = $request->validated();
 
-            // Utiliser le wallet principal par défaut (backward compatibility)
-            $wallet = $user->wallets()->where('is_primary', true)->first();
+            // Récupérer le wallet spécifié
+            $wallet = \App\Models\Wallet::where('user_id', $user->id)->where('reference', $reference)->first();
 
             if (!$wallet) {
-                return $this->error('Wallet principal non trouvé. Veuillez contacter le support.', 404);
+                return $this->error('Wallet non trouvé ou accès non autorisé', 404);
             }
 
             $result = $this->paymentService->makeTransfer($validated, $wallet);

@@ -9,6 +9,7 @@ class OrangeSmsService
 {
     protected $clientId;
     protected $clientSecret;
+    protected $senderNumber;
     protected $baseUrl;
     protected $accessToken;
 
@@ -16,6 +17,7 @@ class OrangeSmsService
     {
         $this->clientId = config('services.orange.client_id');
         $this->clientSecret = config('services.orange.client_secret');
+        $this->senderNumber = config('services.orange.sender_number');
         $this->baseUrl = 'https://api.orange.com';
         $this->accessToken = null;
     }
@@ -90,14 +92,18 @@ class OrangeSmsService
             // Formater le numéro de téléphone (enlever le + si présent)
             $formattedPhone = ltrim($phoneNumber, '+');
 
+            // Utiliser le numéro d'expéditeur configuré
+            $senderAddress = 'tel:' . ltrim($this->senderNumber, '+');
+            $urlEncodedSender = urlencode($senderAddress);
+
             $response = Http::withHeaders([
                 'Authorization' => "Bearer {$token}",
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
-            ])->post("{$this->baseUrl}/smsmessaging/v1/outbound/tel:+221317583/requests", [
+            ])->post("{$this->baseUrl}/smsmessaging/v1/outbound/{$urlEncodedSender}/requests", [
                 'outboundSMSMessageRequest' => [
                     'address' => "tel:+{$formattedPhone}",
-                    'senderAddress' => 'tel:+221317583',
+                    'senderAddress' => $senderAddress,
                     'outboundSMSTextMessage' => [
                         'message' => $message
                     ]
