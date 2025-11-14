@@ -214,7 +214,7 @@ paths:
         - name: reference
           in: path
           required: true
-          description: Référence du wallet (ex: principal, epargne)
+          description: "Référence du wallet (ex: principal, epargne)"
           schema:
             type: string
             example: "principal"
