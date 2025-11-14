@@ -123,68 +123,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /wallets:
-    get:
-      summary: Récupérer les soldes de tous les wallets de l'utilisateur
-      tags:
-        - Wallet
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Soldes récupérés avec succès
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BalanceSuccess'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Aucun wallet trouvé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /wallet/{reference}:
-    get:
-      summary: Récupérer les détails d'un wallet spécifique
-      tags:
-        - Wallet
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: reference
-          in: path
-          required: true
-          description: "Référence du wallet (ex: principal, epargne)"
-          schema:
-            type: string
-            example: "principal"
-      responses:
-        '200':
-          description: Détails du wallet récupérés avec succès
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WalletBalanceSuccess'
-        '401':
-          description: Non authentifié
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Wallet non trouvé ou accès non autorisé
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
   /balance/{reference}:
     get:
       summary: Vérifier le solde d'un wallet spécifique (alias de /wallet/{reference})
@@ -590,73 +528,6 @@ components:
           type: string
           format: date-time
 
-    BalanceSuccess:
-      type: object
-      properties:
-        success:
-          type: boolean
-          example: true
-        message:
-          type: string
-          example: "Soldes récupérés avec succès"
-        data:
-          type: object
-          properties:
-            wallets:
-              type: array
-              items:
-                type: object
-                properties:
-                  reference:
-                    type: string
-                    example: "principal"
-                  label:
-                    type: string
-                    example: "Compte Principal"
-                  balance:
-                    type: number
-                    example: 10000
-                  currency:
-                    type: string
-                    example: "XOF"
-                  is_primary:
-                    type: boolean
-                    example: true
-        timestamp:
-          type: string
-          format: date-time
-
-    WalletBalanceSuccess:
-      type: object
-      properties:
-        success:
-          type: boolean
-          example: true
-        message:
-          type: string
-          example: "Solde du wallet récupéré avec succès"
-        data:
-          type: object
-          properties:
-            reference:
-              type: string
-              example: "principal"
-            label:
-              type: string
-              example: "Compte Principal"
-            balance:
-              type: number
-              example: 10000
-            currency:
-              type: string
-              example: "XOF"
-            is_primary:
-              type: boolean
-              example: true
-        timestamp:
-          type: string
-          format: date-time
-
     TransferSuccess:
       type: object
       properties:
@@ -751,6 +622,36 @@ components:
           type: string
           format: date-time
 
+    QrCodeSuccess:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "QR code de paiement généré avec succès"
+        data:
+          type: object
+          properties:
+            qr_code:
+              type: string
+              description: QR code en base64
+              example: "iVBORw0KGgoAAAANSUhEUgAA..."
+            wallet_id:
+              type: string
+              format: uuid
+              example: "12345678-1234-1234-1234-123456789012"
+            format:
+              type: string
+              example: "base64"
+            mime_type:
+              type: string
+              example: "image/png"
+        timestamp:
+          type: string
+          format: date-time
+
     UserProfileSuccess:
       type: object
       properties:
@@ -835,35 +736,6 @@ components:
           type: string
           format: date-time
 
-    QrCodeSuccess:
-      type: object
-      properties:
-        success:
-          type: boolean
-          example: true
-        message:
-          type: string
-          example: "QR code de paiement généré avec succès"
-        data:
-          type: object
-          properties:
-            qr_code:
-              type: string
-              description: QR code en base64
-              example: "iVBORw0KGgoAAAANSUhEUgAA..."
-            wallet_id:
-              type: string
-              format: uuid
-              example: "12345678-1234-1234-1234-123456789012"
-            format:
-              type: string
-              example: "base64"
-            mime_type:
-              type: string
-              example: "image/png"
-        timestamp:
-          type: string
-          format: date-time
 
     TransactionHistorySuccess:
       type: object

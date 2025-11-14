@@ -49,6 +49,20 @@ class PaymentController extends Controller
     public function checkWalletBalance(string $reference): JsonResponse
     {
         $user = auth()->user();
+
+        // Créer automatiquement un wallet principal si l'utilisateur n'en a pas
+        if (!\App\Models\Wallet::where('user_id', $user->id)->where('is_primary', true)->exists()) {
+            \App\Models\Wallet::create([
+                'id' => \Illuminate\Support\Str::uuid(),
+                'user_id' => $user->id,
+                'reference' => 'principal',
+                'label' => 'Compte Principal',
+                'currency' => 'XOF',
+                'is_primary' => true,
+                'balance' => 10000.00
+            ]);
+        }
+
         $wallet = \App\Models\Wallet::where('user_id', $user->id)->where('reference', $reference)->first();
 
         if (!$wallet) {
@@ -72,6 +86,19 @@ class PaymentController extends Controller
         try {
             $user = auth()->user();
             $validated = $request->validated();
+
+            // Créer automatiquement un wallet principal si l'utilisateur n'en a pas
+            if (!\App\Models\Wallet::where('user_id', $user->id)->where('is_primary', true)->exists()) {
+                \App\Models\Wallet::create([
+                    'id' => \Illuminate\Support\Str::uuid(),
+                    'user_id' => $user->id,
+                    'reference' => 'principal',
+                    'label' => 'Compte Principal',
+                    'currency' => 'XOF',
+                    'is_primary' => true,
+                    'balance' => 10000.00
+                ]);
+            }
 
             // Récupérer le wallet spécifié
             $wallet = \App\Models\Wallet::where('user_id', $user->id)->where('reference', $reference)->first();
@@ -102,6 +129,10 @@ class PaymentController extends Controller
             ], 'Paiement effectué avec succès');
 
         } catch (Exception $e) {
+            // Debug: afficher l'erreur réelle
+            if (app()->environment('local')) {
+                return $this->error('DEBUG: ' . $e->getMessage() . ' | File: ' . $e->getFile() . ' | Line: ' . $e->getLine(), 400);
+            }
             return $this->error($e->getMessage(), 400);
         }
     }
@@ -115,6 +146,19 @@ class PaymentController extends Controller
         try {
             $user = auth()->user();
             $validated = $request->validated();
+
+            // Créer automatiquement un wallet principal si l'utilisateur n'en a pas
+            if (!\App\Models\Wallet::where('user_id', $user->id)->where('is_primary', true)->exists()) {
+                \App\Models\Wallet::create([
+                    'id' => \Illuminate\Support\Str::uuid(),
+                    'user_id' => $user->id,
+                    'reference' => 'principal',
+                    'label' => 'Compte Principal',
+                    'currency' => 'XOF',
+                    'is_primary' => true,
+                    'balance' => 10000.00
+                ]);
+            }
 
             // Récupérer le wallet spécifié
             $wallet = \App\Models\Wallet::where('user_id', $user->id)->where('reference', $reference)->first();

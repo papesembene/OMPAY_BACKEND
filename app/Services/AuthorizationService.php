@@ -58,10 +58,8 @@ class AuthorizationService implements AuthorizationServiceInterface
             throw new Exception('Montant invalide');
         }
 
-        // Vérifier le solde
-        if (!$user->wallet || $user->wallet->balance < $amount) {
-            throw new Exception('Solde insuffisant');
-        }
+        // Le solde sera vérifié dans le PaymentService avec le wallet spécifique
+        // Ici on ne fait que les validations générales
 
         // Vérifier la limite journalière
         $this->checkDailyLimit($user, $amount);
@@ -82,10 +80,8 @@ class AuthorizationService implements AuthorizationServiceInterface
             throw new Exception('Montant invalide');
         }
 
-        // Vérifier le solde
-        if (!$user->wallet || $user->wallet->balance < $amount) {
-            throw new Exception('Solde insuffisant');
-        }
+        // Le solde sera vérifié dans le PaymentService avec le wallet spécifique
+        // Ici on ne fait que les validations générales
 
         // Empêcher le transfert vers soi-même
         if ($recipientPhone === $user->phone) {

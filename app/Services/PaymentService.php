@@ -37,10 +37,8 @@ class PaymentService implements PaymentServiceInterface
             throw new Exception('Utilisateur non authentifié');
         }
 
-        // Utiliser le wallet passé en paramètre ou récupérer celui par défaut
-        if (!$wallet) {
-            $wallet = $user->wallet()->first();
-        }
+        // Le wallet doit être passé en paramètre dans le système multi-wallet
+        // Plus de fallback automatique
 
         Log::info('User ID: ' . $user->id);
         Log::info('Wallet: ', ['wallet' => $wallet]);
@@ -98,10 +96,8 @@ class PaymentService implements PaymentServiceInterface
                 throw new Exception('Utilisateur non authentifié');
             }
 
-            // Utiliser le wallet passé en paramètre ou récupérer celui par défaut
-            if (!$walletSender) {
-                $walletSender = $user->wallet()->first();
-            }
+            // Le wallet doit être passé en paramètre dans le système multi-wallet
+            // Plus de fallback automatique
 
             if (!$walletSender) {
                 throw new Exception('Portefeuille expéditeur introuvable.');

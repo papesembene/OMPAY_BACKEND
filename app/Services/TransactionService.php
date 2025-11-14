@@ -29,13 +29,8 @@ class TransactionService implements TransactionServiceInterface
             throw new \Exception('Utilisateur non trouvé');
         }
 
-        // Utiliser le wallet passé en paramètre ou récupérer celui par défaut
         if (!$wallet) {
-            $wallet = $user->wallet()->first();
-        }
-
-        if (!$wallet) {
-            throw new \Exception('Wallet non trouvé');
+            throw new \Exception('Wallet non fourni - requis dans le système multi-wallet');
         }
 
         return Transaction::create([
@@ -64,13 +59,10 @@ class TransactionService implements TransactionServiceInterface
             throw new \Exception('Utilisateur non trouvé');
         }
 
-        // Utiliser le wallet passé en paramètre ou récupérer celui par défaut
-        if (!$wallet) {
-            $wallet = $user->wallet()->first();
-        }
+        // Le wallet doit être passé en paramètre dans le système multi-wallet
 
         if (!$wallet) {
-            throw new \Exception('Wallet non trouvé');
+            throw new \Exception('Wallet non fourni - requis dans le système multi-wallet');
         }
 
         return Transaction::create([

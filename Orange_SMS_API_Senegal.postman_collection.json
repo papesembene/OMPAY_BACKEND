@@ -22,12 +22,12 @@
     },
     {
       "key": "client_id",
-      "value": "SxSKVRFXB7JQJuvOZpkM9UaNAaLrTRRu",
+      "value": "gg7IzICvtZkXrPIQD2jLPTfNRabnxSZD",
       "type": "string"
     },
     {
       "key": "client_secret",
-      "value": "yyox8DqjCjdCkBl2XPKBuQFluGcorBRyeW9VictalAZK",
+      "value": "Enckahtq5dgVQHChXmaJrt3QoPsg1d8cpldRrkoLitXq",
       "type": "string"
     },
     {
@@ -37,7 +37,7 @@
     },
     {
       "key": "sender_address",
-      "value": "",
+      "value": "tel:+221781157773",
       "type": "string"
     }
   ],
